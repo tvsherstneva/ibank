@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 const API_URL = 'http://localhost:9999/api';
 const showAccount = (parentEl, data, err) => {
     if (err) {
@@ -7,27 +7,36 @@ const showAccount = (parentEl, data, err) => {
         `;
         return;
     }
-    console.log(data.account.name);
-    parentEl.querySelectorAll('.name')[0].innerHTML = data.account.name;
-    parentEl.querySelectorAll('.number')[0].innerHTML = data.account.number;
-    parentEl.querySelectorAll('.amount')[0].innerHTML = data.account.amount.toFixed(2);
+    let amount = data.account.amount.toFixed(2);
+    amount = String(amount);
+    amount = amount.replace('.',',');
+    parentEl.innerHTML = `   
+     <div class="info">
+            <div class="name">${data.account.name}</div>
+            <div class="number">${data.account.number}</div>
+            <div class="balance">
+                <span class="amount">${amount}</span> ₽
+            </div>
+        </div>
+    `;
+};
 
+const showLoader = (parentEl) => {
+    parentEl.innerHTML = `
+                        <div class="loading-indicator"></div>
+                    `;
+};
 
-}
-//TODO:рубль в html
 const loadAccount = async (el) => {
     try {
+        showLoader(el);
         const response = await fetch(`${API_URL}/hw15`);
-        console.log(response);
-        console.log(response.ok);
         if (!response.ok) {
             throw new Error(response.statusText);
         }
         const data = await response.json();
-        console.log(data);
         showAccount(el, data);
     } catch (e) {
-        console.error(e);
         showAccount(el, null, e);
     }
 };
